@@ -22,7 +22,7 @@ public class Snake : MonoBehaviour
     {
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
-        m_SnakeLength = 1.2f;
+        m_SnakeLength = 0.2f;
         m_SnakeRadius = 0.5f;
 
         m_SplinePointsWorld = new Vector3[kSplineMax];
@@ -149,4 +149,14 @@ public class Snake : MonoBehaviour
         m_MeshFilter.mesh.SetTriangles(tris, 0);
         m_MeshFilter.mesh.RecalculateNormals();
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<Fruit>() != null)
+        {
+            Debug.Log($"This fruit was eaten! {collision.gameObject.name}");
+            Destroy(collision.gameObject);
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ public class CameraFollow : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_DistanceFromCenter = 3;
+        m_DistanceFromCenter = 1.5f;
     }
 
     // Update is called once per frame
