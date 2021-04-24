@@ -92,7 +92,17 @@ public class Snake : MonoBehaviour
             forward.Normalize();
             Vector3 up = transform.InverseTransformDirection(m_SplinePointsWorld[v]).normalized;
             Vector3 right = Vector3.Cross(forward, up).normalized;
-            Vector3 spinePoint = transform.InverseTransformPoint(m_SplinePointsWorld[v]);
+            Vector3 spinePoint;
+            if (v == 0)
+            {
+                spinePoint = transform.InverseTransformPoint(m_SplinePointsWorld[v]);
+            } else if (v < m_SplineN - 1)
+            {
+                spinePoint = transform.InverseTransformPoint(Vector3.Lerp(m_SplinePointsWorld[v + 1], m_SplinePointsWorld[v], headSpacing / kSpacing));
+            } else
+            {
+                spinePoint = transform.InverseTransformPoint(m_SplinePointsWorld[v]);
+            }
 
             for (int u = 0; u < kCircumferenceMax; u++)
             {
