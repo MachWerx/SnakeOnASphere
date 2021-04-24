@@ -73,7 +73,6 @@ public class Snake : MonoBehaviour
 
         // create the mesh
         Vector3[] vertices = new Vector3[kCircumferenceMax * (m_SplineN + kExtraHeadRows)];
-        Vector3[] normals = new Vector3[kCircumferenceMax * (m_SplineN + kExtraHeadRows)];
         int[] tris = new int[2 * 3 * kCircumferenceMax * (m_SplineN + kExtraHeadRows - 1)];
         //Vector2[] uv = new Vector2[2 * (steps + 1)];
 
@@ -128,18 +127,6 @@ public class Snake : MonoBehaviour
                 float angle = 2.0f * Mathf.PI * u / kCircumferenceMax;
                 vertices[v * kCircumferenceMax + u] = spinePoint + radius * (Mathf.Cos(angle) * right + Mathf.Sin(angle) * up);
 
-                // calculate the normals
-                if (v == 0)
-                {
-                    normals[v * kCircumferenceMax + u] = forward;
-                } else if (v < m_SplineN - 2)
-                {
-                    normals[v * kCircumferenceMax + u] = (vertices[v * kCircumferenceMax + u] - spinePoint).normalized;
-                } else
-                {
-                    normals[v * kCircumferenceMax + u] = -forward;
-                }
-
                 // set the triangles
                 if (v < m_SplineN - 1)
                 {
@@ -159,7 +146,7 @@ public class Snake : MonoBehaviour
 
         m_MeshFilter.mesh.Clear();
         m_MeshFilter.mesh.vertices = vertices;
-        m_MeshFilter.mesh.normals = normals;
         m_MeshFilter.mesh.SetTriangles(tris, 0);
+        m_MeshFilter.mesh.RecalculateNormals();
     }
 }
