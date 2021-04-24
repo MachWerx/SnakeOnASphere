@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     {
         m_WorldRadius = 0.5f;
 
-        m_FruitN = 12;
+        m_FruitN = 100;
         m_Fruits = new Fruit[m_FruitN];
 
         for (int i = 0; i < m_FruitN; i++)

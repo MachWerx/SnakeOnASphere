@@ -7,6 +7,7 @@ public class Snake : MonoBehaviour
     private float m_Speed;
     private float m_RotationSpeed;
     private float m_SnakeLength;
+    private float m_SnakeLengthMax;
     private float m_SnakeRadius;
     private Vector3[] m_SplinePointsWorld;
     private int m_SplineN;
@@ -22,7 +23,7 @@ public class Snake : MonoBehaviour
     {
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
-        m_SnakeLength = 0.2f;
+        m_SnakeLength = m_SnakeLengthMax = 0.2f;
         m_SnakeRadius = 0.5f;
 
         m_SplinePointsWorld = new Vector3[kSplineMax];
@@ -52,9 +53,17 @@ public class Snake : MonoBehaviour
             Vector3 pos = transform.position;
             pos += m_Speed * transform.up * Time.deltaTime;
             pos = 0.5f * pos.normalized;
+            float distanceTraveled = Vector3.Distance(transform.position, pos);
             transform.position = pos;
             //transform.rotation *= Quaternion.FromToRotation(transform.forward, -pos.normalized);
             transform.rotation = Quaternion.LookRotation(-pos, transform.up);
+
+            if (m_SnakeLength < m_SnakeLengthMax)
+            {
+                m_SnakeLength += distanceTraveled;
+                if (m_SnakeLength > m_SnakeLengthMax)
+                    m_SnakeLength = m_SnakeLengthMax;
+            }
         }
 
         // propagate the spline
@@ -156,6 +165,8 @@ public class Snake : MonoBehaviour
         {
             Debug.Log($"This fruit was eaten! {collision.gameObject.name}");
             Destroy(collision.gameObject);
+
+            m_SnakeLengthMax += 0.1f;
         }
     }
 
