@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform m_StartButton;
     [SerializeField] private Color[] m_LevelColors;
     [SerializeField] private PostProcessVolume m_PostProcessVolume;
+    [SerializeField] private TMPro.TextMeshPro m_Score;
 
     private float m_WorldRadius = 0.5f;
     private int m_FruitN;
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour
         SpawnNextWorld();
         m_FruitsBasket.gameObject.SetActive(false);
         m_LevelIndicatorsTransform.gameObject.SetActive(false);
+        m_Snake.Init(m_Score);
 
         // create level indicators
         m_LevelIndicators = new GameObject[kLevelMax];
@@ -93,6 +95,7 @@ public class GameManager : MonoBehaviour
         
         else if (m_GameMode == GameMode.Game)
         {
+            // advance level when all the fruits are eaten
             if (m_CurrentLevel < kLevelMax - 1 && m_FruitsBasket.childCount == 0)
             {
                 m_World.Explode();
@@ -113,7 +116,7 @@ public class GameManager : MonoBehaviour
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
 
-                m_Snake.Init();
+                m_Snake.Init(m_Score);
 
                 // Destroy all worlds, fruits, and level indicators
                 foreach (Transform child in m_Worlds)
@@ -151,6 +154,9 @@ public class GameManager : MonoBehaviour
                 m_WorldNext = Instantiate(m_World, m_Worlds);
                 m_WorldNext.transform.localScale = 2.0f * m_WorldRadius * Vector3.one;
                 m_WorldNext.GetComponent<MeshRenderer>().material.SetColor("_Color", m_LevelColors[m_CurrentLevel + 1]);
+            } else
+            {
+                m_Snake.bonusMode = true;
             }
             m_World.Retesselate();
         }

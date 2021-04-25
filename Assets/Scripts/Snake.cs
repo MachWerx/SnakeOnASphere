@@ -26,25 +26,53 @@ public class Snake : MonoBehaviour
 
     private Color m_InitialColor;
 
+    private TMPro.TextMeshPro m_ScoreTextField;
+    private int m_Score;
+    private const int kFruitScoreIncrement = 50;
+    private float m_BonusScoreOverage;
+    private const float kBonusScoreSpeed = 50.0f;
+
+    private int score
+    {
+        get { return m_Score; }
+        set
+        {
+            m_Score = value;
+            m_ScoreTextField.text = m_Score.ToString();
+        }
+    }
+
+    private bool m_FirstInit = true;
     enum Mode { Menu, Alive, Dying, Dead }
+    public bool bonusMode
+    {
+        private get;
+        set;
+    }
 
     // Start is called before the first frame update
     private void Start()
     {
-        m_SplinePointsWorld = new Vector3[kSplineMax];
-        m_SplineN = 2;
-        m_SplinePointsWorld[0] = transform.position;
-        m_SplinePointsWorld[1] = transform.position;
-
-        m_MeshFilter = gameObject.GetComponent<MeshFilter>();
-        m_Material = gameObject.GetComponent<MeshRenderer>().material;
-        m_InitialColor = m_Material.color;
-
-        Init();
     }
 
-    public void Init()
+    public void Init(TMPro.TextMeshPro scoreTextField)
     {
+        if (m_FirstInit)
+        {
+            m_SplinePointsWorld = new Vector3[kSplineMax];
+            m_SplineN = 2;
+            m_SplinePointsWorld[0] = transform.position;
+            m_SplinePointsWorld[1] = transform.position;
+
+            m_MeshFilter = gameObject.GetComponent<MeshFilter>();
+            m_Material = gameObject.GetComponent<MeshRenderer>().material;
+            m_InitialColor = m_Material.color;
+
+            m_Score = 0;
+
+            m_FirstInit = false;
+        }
+
         m_Mode = Mode.Menu;
         distanceFromCenter = .5f;
         m_Speed = 0.2f;
@@ -55,6 +83,10 @@ public class Snake : MonoBehaviour
         m_SnakeLength = m_SnakeLengthMax = 0.2f;
         m_SnakeRadius = 0.5f;
         m_Material.color = m_InitialColor;
+
+        m_ScoreTextField = scoreTextField;
+        m_BonusScoreOverage = 0;
+        bonusMode = false;
     }
 
     // Update is called once per frame
@@ -211,11 +243,22 @@ public class Snake : MonoBehaviour
                 m_Mode = Mode.Dead;
             }
         }
+
+        if (m_Mode == Mode.Alive && bonusMode)
+        {
+            m_BonusScoreOverage += kBonusScoreSpeed * Time.deltaTime;
+            if (m_BonusScoreOverage > 1.0f)
+            {
+                m_BonusScoreOverage -= 1.0f;
+                score++;
+            }
+        }
     }
 
     public void StartGame()
     {
         m_Mode = Mode.Alive;
+        score = 0;
     }
 
     public bool IsDead() {
@@ -227,7 +270,7 @@ public class Snake : MonoBehaviour
         if (collision.gameObject.GetComponent<Fruit>() != null)
         {
             Destroy(collision.gameObject);
-
+            score += kFruitScoreIncrement;
             m_SnakeLengthMax += 0.1f;
         }
     }
