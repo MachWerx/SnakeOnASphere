@@ -1,10 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private Transform m_Worlds;
     [SerializeField] private World m_World;
+    [SerializeField] private World m_WorldPrefab;
     [SerializeField] private Snake m_Snake;
     [SerializeField] private Fruit m_FruitPrefab;
     [SerializeField] private Transform m_FruitsBasket;
@@ -12,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform m_LevelIndicatorsTransform;
     [SerializeField] private Transform m_StartButton;
     [SerializeField] private Color[] m_LevelColors;
+    [SerializeField] private PostProcessVolume m_PostProcessVolume;
 
     private float m_WorldRadius = 0.5f;
     private int m_FruitN;
@@ -26,7 +28,12 @@ public class GameManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
+    {
+        Init();
+    }
+
+    void Init()
     {
         m_GameMode = GameMode.MainMenu;
         m_WorldRadius = 0.5f;
@@ -52,7 +59,12 @@ public class GameManager : MonoBehaviour
     {
         if (m_GameMode == GameMode.MainMenu)
         {
-            if (Input.GetMouseButtonDown(0))
+            bool startGame = false;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                startGame = true;
+            }
+            else if (Input.GetMouseButtonDown(0))
             {
                 RaycastHit hit;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -60,19 +72,26 @@ public class GameManager : MonoBehaviour
                 {
                     if (hit.transform == m_StartButton) 
                     {
-                        m_GameMode = GameMode.Game;
-
-                        m_StartButton.gameObject.SetActive(false);
-                        m_FruitsBasket.gameObject.SetActive(true);
-                        m_LevelIndicatorsTransform.gameObject.SetActive(true);
-
-                        Cursor.visible = false;
-                        Cursor.lockState = CursorLockMode.Locked;
+                        startGame = true;
                     }
                 }
 
             }
-        } else if (m_GameMode == GameMode.Game)
+
+            if (startGame)
+            {
+                m_GameMode = GameMode.Game;
+                m_Snake.StartGame();
+
+                m_StartButton.gameObject.SetActive(false);
+                m_FruitsBasket.gameObject.SetActive(true);
+                m_LevelIndicatorsTransform.gameObject.SetActive(true);
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+        }
+        
+        else if (m_GameMode == GameMode.Game)
         {
             if (m_CurrentLevel < kLevelMax - 1 && m_FruitsBasket.childCount == 0)
             {
@@ -82,6 +101,38 @@ public class GameManager : MonoBehaviour
                 SpawnNextWorld();
 
                 Destroy(m_LevelIndicators[m_CurrentLevel - 1]);
+            }
+
+            if (m_Snake.IsDead())
+            {
+                m_GameMode = GameMode.MainMenu;
+
+                m_StartButton.gameObject.SetActive(true);
+                m_FruitsBasket.gameObject.SetActive(false);
+                m_LevelIndicatorsTransform.gameObject.SetActive(false);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+
+                m_Snake.Init();
+
+                // Destroy all worlds, fruits, and level indicators
+                foreach (Transform child in m_Worlds)
+                {
+                    Destroy(child.gameObject);
+                }
+                foreach (Transform child in m_FruitsBasket)
+                {
+                    Destroy(child.gameObject);
+                }
+                foreach (Transform child in m_LevelIndicatorsTransform)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                // Create initial world
+                m_World = Instantiate(m_WorldPrefab, m_Worlds);
+                m_World.m_PostProcessVolume = m_PostProcessVolume;
+                Init();
             }
         }
     }
@@ -97,7 +148,7 @@ public class GameManager : MonoBehaviour
                 AddFruits();
 
                 m_WorldRadius -= 0.05f;
-                m_WorldNext = Instantiate(m_World);
+                m_WorldNext = Instantiate(m_World, m_Worlds);
                 m_WorldNext.transform.localScale = 2.0f * m_WorldRadius * Vector3.one;
                 m_WorldNext.GetComponent<MeshRenderer>().material.SetColor("_Color", m_LevelColors[m_CurrentLevel + 1]);
             }

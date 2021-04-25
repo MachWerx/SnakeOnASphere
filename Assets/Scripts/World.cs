@@ -3,7 +3,7 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class World : MonoBehaviour
 {
-    [SerializeField] private PostProcessVolume m_PostProcessVolume;
+    public PostProcessVolume m_PostProcessVolume;
 
     private float m_Radius;
     private Mesh m_Mesh;
@@ -63,7 +63,6 @@ public class World : MonoBehaviour
 
             if (m_BurstFactor > 0)
             {
-                Debug.Log($"Reducing bloom");
                 m_BurstFactor -= kBurstSpeed * Time.deltaTime;
                 if (m_BurstFactor < 0) m_BurstFactor = 0;
             } else
