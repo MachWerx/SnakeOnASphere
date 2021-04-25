@@ -1,18 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 public class World : MonoBehaviour
 {
-    private float m_Radius;
+    [SerializeField] private PostProcessVolume m_PostProcessVolume;
 
-    //private const float kPointsMax
+    private float m_Radius;
     private Mesh m_Mesh;
-    Vector3[] m_Vertices;
-    int[] m_Tris;
-    int[] m_TriIndices;  // map from edges to triangle index
-    Vector3[] m_Centers;
-    Vector3[] m_Vels;
+    private Material m_Material;
+    private Vector3[] m_Vertices;
+    private int[] m_Tris;
+    private int[] m_TriIndices;  // map from edges to triangle index
+    private Vector3[] m_Centers;
+    private Vector3[] m_Vels;
+    private float m_BurstFactor;
+    private const float kBurstSpeed = 2.0f;
+    private Color m_BurstColor;
 
     enum Mode { Stable, Exploding };
     private Mode m_Mode;
@@ -21,6 +24,8 @@ public class World : MonoBehaviour
     void Start()
     {
         m_Mode = Mode.Stable;
+        //m_MeshRenderer = gameObject.GetComponent<MeshRenderer>();
+        m_Material = gameObject.GetComponent<MeshRenderer>().material;
     }
 
     // Update is called once per frame
@@ -41,6 +46,23 @@ public class World : MonoBehaviour
                 m_Vertices[i + 2] = Vector3.Lerp(m_Vertices[i + 2], m_Centers[i / 3], nudge * Time.deltaTime);
             }
             m_Mesh.vertices = m_Vertices;
+        }
+
+        if (m_BurstFactor >= 0)
+        {
+            float intensity = Mathf.Pow(2.0f, 4.0f * m_BurstFactor) - 1.0f;
+            m_Material.SetColor("_EmissionColor", intensity * m_BurstColor);
+            Bloom bloom = m_PostProcessVolume.profile.GetSetting<Bloom>();
+            bloom.intensity.value = intensity;
+
+            if (m_BurstFactor > 0)
+            {
+                m_BurstFactor -= kBurstSpeed * Time.deltaTime;
+                if (m_BurstFactor < 0) m_BurstFactor = 0;
+            } else
+            {
+                m_BurstFactor = -1;
+            }
         }
     }
 
@@ -130,6 +152,14 @@ public class World : MonoBehaviour
         m_Mode = Mode.Exploding;
     }
 
+    public void BurstColor()
+    {
+        //gameObject.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", 2.0f * Color.white); 
+        m_BurstColor = m_Material.GetColor("_Color");
+        m_Material.EnableKeyword("_EMISSION");
+        m_BurstFactor = 1.0f;
+    }
+
     private void AddEdge(int a, int b, int tri)
     {
         int n = m_Vertices.Length;
@@ -167,7 +197,7 @@ public class World : MonoBehaviour
         if (Vector3.Distance(C, D) > 1.1f * abDist || abDist > Vector3.Distance(B, C) && abDist > Vector3.Distance(C, A) && Random.value > 0.5f) 
 
         {
-            Debug.Log($"Swapping {tri} and {otherTri}");
+            //Debug.Log($"Swapping {tri} and {otherTri}");
             // swap the edge
             //Debug.Log($"({a}, {b}, {c}) Swapping {tri} ({m_Tris[tri]}, {m_Tris[tri+1]}, {m_Tris[tri+2]}) and {otherTri} ({m_Tris[otherTri]}, {m_Tris[otherTri + 1]}, {m_Tris[otherTri + 2]})");
 

@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48a79b01ea5641d4aa6daa2e23605641, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
   intensity:
     overrideState: 1
-    value: 5
+    value: 0
   threshold:
     overrideState: 1
     value: 1
@@ -30,7 +30,7 @@ MonoBehaviour:
     value: 65472
   diffusion:
     overrideState: 1
-    value: 8
+    value: 10
   anamorphicRatio:
     overrideState: 0
     value: 0
@@ -38,8 +38,8 @@ MonoBehaviour:
     overrideState: 1
     value: {r: 1, g: 1, b: 1, a: 1}
   fastMode:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 1
   dirtTexture:
     overrideState: 0
     value: {fileID: 0}

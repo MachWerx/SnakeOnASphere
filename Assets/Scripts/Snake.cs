@@ -23,7 +23,7 @@ public class Snake : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        distanceFromCenter = 0.5f;
+        distanceFromCenter = .5f;
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
         float speedFactor = 2.0f;
@@ -138,7 +138,7 @@ public class Snake : MonoBehaviour
                 float collisionFactor = Vector3.Distance(headPoint, spinePoint) / (m_SnakeRadius + radius);
                 if (collisionFactor < .8f)
                 {
-                    isDead = true;
+                    //isDead = true;
                 } else if (collisionFactor < 1.0f)
                 {
                     bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
