@@ -2,6 +2,9 @@
 
 public class Snake : MonoBehaviour
 {
+    public float distanceFromCenter { private get; set; }
+
+
     private float m_Speed;
     private float m_RotationSpeed;
     private float m_SnakeLength;
@@ -20,6 +23,7 @@ public class Snake : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        distanceFromCenter = 0.5f;
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
         float speedFactor = 2.0f;
@@ -55,7 +59,7 @@ public class Snake : MonoBehaviour
         {
             Vector3 pos = transform.position;
             pos += m_Speed * transform.up * Time.deltaTime;
-            pos = 0.5f * pos.normalized;
+            pos = distanceFromCenter * pos.normalized;
             float distanceTraveled = Vector3.Distance(transform.position, pos);
             transform.position = pos;
             //transform.rotation *= Quaternion.FromToRotation(transform.forward, -pos.normalized);

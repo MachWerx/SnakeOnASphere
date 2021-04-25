@@ -21,6 +21,31 @@ public class World : MonoBehaviour
     void Start()
     {
         m_Mode = Mode.Stable;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (m_Mode == Mode.Exploding)
+        {
+            float nudge = 2f;
+            for (int i = 0; i < m_Tris.Length; i += 3)
+            {
+                Vector3 a = m_Vertices[m_Tris[i]];
+                Vector3 b = m_Vertices[m_Tris[i + 1]];
+                Vector3 c = m_Vertices[m_Tris[i + 2]];
+
+                m_Centers[i / 3] += m_Vels[i / 3] * Time.deltaTime;
+                m_Vertices[i] = Vector3.Lerp(m_Vertices[i], m_Centers[i / 3], nudge * Time.deltaTime);
+                m_Vertices[i + 1] = Vector3.Lerp(m_Vertices[i + 1], m_Centers[i / 3], nudge * Time.deltaTime);
+                m_Vertices[i + 2] = Vector3.Lerp(m_Vertices[i + 2], m_Centers[i / 3], nudge * Time.deltaTime);
+            }
+            m_Mesh.vertices = m_Vertices;
+        }
+    }
+
+    public void Retesselate()
+    {
         m_Radius = 0.5f;
 
         m_Mesh = gameObject.GetComponent<MeshFilter>().mesh;
@@ -98,27 +123,6 @@ public class World : MonoBehaviour
         m_Mesh.vertices = m_Vertices;
         m_Mesh.SetTriangles(m_Tris, 0);
         m_Mesh.RecalculateNormals();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (m_Mode == Mode.Exploding)
-        {
-            float nudge = 2f;
-            for (int i = 0; i < m_Tris.Length; i += 3)
-            {
-                Vector3 a = m_Vertices[m_Tris[i]];
-                Vector3 b = m_Vertices[m_Tris[i + 1]];
-                Vector3 c = m_Vertices[m_Tris[i + 2]];
-
-                m_Centers[i / 3] += m_Vels[i / 3] * Time.deltaTime;
-                m_Vertices[i] = Vector3.Lerp(m_Vertices[i], m_Centers[i / 3], nudge * Time.deltaTime);
-                m_Vertices[i + 1] = Vector3.Lerp(m_Vertices[i + 1], m_Centers[i / 3], nudge * Time.deltaTime);
-                m_Vertices[i + 2] = Vector3.Lerp(m_Vertices[i + 2], m_Centers[i / 3], nudge * Time.deltaTime);
-            }
-            m_Mesh.vertices = m_Vertices;
-        }
     }
 
     public void Explode()
