@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private Snake m_Snake;
     [SerializeField] private Fruit m_FruitPrefab;
+    [SerializeField] private Transform m_FruitsBasket;
 
     private float m_WorldRadius = 0.5f;
     private int m_FruitN;
@@ -22,11 +23,10 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < m_FruitN; i++)
         {
             Quaternion rotation = Random.rotationUniform;
-            var fruit = GameObject.Instantiate(m_FruitPrefab);
+            var fruit = GameObject.Instantiate(m_FruitPrefab, m_FruitsBasket);
             fruit.transform.rotation = rotation;
             fruit.transform.position = m_WorldRadius * (rotation * Vector3.up);
             m_Fruits[i] = fruit;
-
         }
     }
 
