@@ -14,6 +14,7 @@ public class World : MonoBehaviour
     private Vector3[] m_Centers;
     private Vector3[] m_Vels;
     private float m_BurstFactor;
+    private float m_ExplosionFactor;
     private const float kBurstSpeed = 2.0f;
     private Color m_BurstColor;
 
@@ -24,7 +25,6 @@ public class World : MonoBehaviour
     void Start()
     {
         m_Mode = Mode.Stable;
-        //m_MeshRenderer = gameObject.GetComponent<MeshRenderer>();
         m_Material = gameObject.GetComponent<MeshRenderer>().material;
     }
 
@@ -46,9 +46,15 @@ public class World : MonoBehaviour
                 m_Vertices[i + 2] = Vector3.Lerp(m_Vertices[i + 2], m_Centers[i / 3], nudge * Time.deltaTime);
             }
             m_Mesh.vertices = m_Vertices;
+
+            m_ExplosionFactor -= Time.deltaTime;
+            if (m_ExplosionFactor < 0)
+            {
+                Destroy(gameObject);
+            }
         }
 
-        if (m_BurstFactor >= 0)
+        if (m_BurstFactor >= 0 && m_Mode == Mode.Stable)
         {
             float intensity = Mathf.Pow(2.0f, 4.0f * m_BurstFactor) - 1.0f;
             m_Material.SetColor("_EmissionColor", intensity * m_BurstColor);
@@ -57,6 +63,7 @@ public class World : MonoBehaviour
 
             if (m_BurstFactor > 0)
             {
+                Debug.Log($"Reducing bloom");
                 m_BurstFactor -= kBurstSpeed * Time.deltaTime;
                 if (m_BurstFactor < 0) m_BurstFactor = 0;
             } else
@@ -150,6 +157,7 @@ public class World : MonoBehaviour
     public void Explode()
     {
         m_Mode = Mode.Exploding;
+        m_ExplosionFactor = 1.0f;
     }
 
     public void BurstColor()

@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
             m_LevelIndicators[i].transform.localPosition = new Vector3(-1.2f, (kLevelMax - i - 0.5f) / kLevelMax - 0.5f, 1);
             m_LevelIndicators[i].GetComponent<MeshRenderer>().material.SetColor("_Color", m_LevelColors[i]);
         }
+
     }
 
     // Update is called once per frame
@@ -57,13 +58,16 @@ public class GameManager : MonoBehaviour
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.transform == m_StartButton) Debug.Log("My object is clicked by mouse");
+                    if (hit.transform == m_StartButton) 
                     {
                         m_GameMode = GameMode.Game;
 
                         m_StartButton.gameObject.SetActive(false);
                         m_FruitsBasket.gameObject.SetActive(true);
                         m_LevelIndicatorsTransform.gameObject.SetActive(true);
+
+                        Cursor.visible = false;
+                        Cursor.lockState = CursorLockMode.Locked;
                     }
                 }
 
@@ -103,7 +107,7 @@ public class GameManager : MonoBehaviour
 
     private void AddFruits()
     {
-        m_FruitN = 3;
+        m_FruitN = 1;
         m_Fruits = new Fruit[m_FruitN];
 
         for (int i = 0; i < m_FruitN; i++)

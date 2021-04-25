@@ -54,6 +54,8 @@ public class Snake : MonoBehaviour
             transform.rotation = Quaternion.AngleAxis(-m_RotationSpeed * Time.deltaTime, transform.forward) * transform.rotation;
         }
 
+        transform.rotation = Quaternion.AngleAxis(-2000.0f * Input.GetAxis("Mouse X") / Camera.main.pixelWidth, transform.forward) * transform.rotation;
+
         // advance the snake
         //if (Input.GetKey(KeyCode.UpArrow))
         {
