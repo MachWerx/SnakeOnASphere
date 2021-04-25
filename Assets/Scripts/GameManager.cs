@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform m_FruitsBasket;
     [SerializeField] private GameObject m_LevelIndicatorPrefab;
     [SerializeField] private Transform m_LevelIndicatorsTransform;
+    [SerializeField] private Transform m_StartButton;
     [SerializeField] private Color[] m_LevelColors;
 
     private float m_WorldRadius = 0.5f;
@@ -19,13 +20,20 @@ public class GameManager : MonoBehaviour
     private int m_CurrentLevel;
     private GameObject[] m_LevelIndicators;
     private const int kLevelMax = 8;
+    private GameMode m_GameMode;
+
+    enum GameMode { MainMenu, Game };
+
 
     // Start is called before the first frame update
     void Start()
     {
+        m_GameMode = GameMode.MainMenu;
         m_WorldRadius = 0.5f;
         m_CurrentLevel = -1;
         SpawnNextWorld();
+        m_FruitsBasket.gameObject.SetActive(false);
+        m_LevelIndicatorsTransform.gameObject.SetActive(false);
 
         // create level indicators
         m_LevelIndicators = new GameObject[kLevelMax];
@@ -41,14 +49,36 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_CurrentLevel < kLevelMax - 1 && m_FruitsBasket.childCount == 0)
+        if (m_GameMode == GameMode.MainMenu)
         {
-            m_World.Explode();
-            m_World = m_WorldNext;
-            m_World.BurstColor();
-            SpawnNextWorld();
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit hit;
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform == m_StartButton) Debug.Log("My object is clicked by mouse");
+                    {
+                        m_GameMode = GameMode.Game;
 
-            Destroy(m_LevelIndicators[m_CurrentLevel - 1]);
+                        m_StartButton.gameObject.SetActive(false);
+                        m_FruitsBasket.gameObject.SetActive(true);
+                        m_LevelIndicatorsTransform.gameObject.SetActive(true);
+                    }
+                }
+
+            }
+        } else if (m_GameMode == GameMode.Game)
+        {
+            if (m_CurrentLevel < kLevelMax - 1 && m_FruitsBasket.childCount == 0)
+            {
+                m_World.Explode();
+                m_World = m_WorldNext;
+                m_World.BurstColor();
+                SpawnNextWorld();
+
+                Destroy(m_LevelIndicators[m_CurrentLevel - 1]);
+            }
         }
     }
 
