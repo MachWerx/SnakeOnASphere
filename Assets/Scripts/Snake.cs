@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Snake : MonoBehaviour
 {
@@ -12,6 +10,7 @@ public class Snake : MonoBehaviour
     private Vector3[] m_SplinePointsWorld;
     private int m_SplineN;
     private MeshFilter m_MeshFilter;
+    private Material m_Material;
 
     private const float kSpacing = .02f;
     private const int kSplineMax = 1000;
@@ -23,6 +22,9 @@ public class Snake : MonoBehaviour
     {
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
+        float speedFactor = 2.0f;
+        m_Speed *= speedFactor;
+        m_RotationSpeed *= speedFactor;
         m_SnakeLength = m_SnakeLengthMax = 0.2f;
         m_SnakeRadius = 0.5f;
 
@@ -32,6 +34,7 @@ public class Snake : MonoBehaviour
         m_SplinePointsWorld[1] = transform.position;
 
         m_MeshFilter = gameObject.GetComponent<MeshFilter>();
+        m_Material = gameObject.GetComponent<MeshRenderer>().material;
     }
 
     // Update is called once per frame
@@ -85,6 +88,8 @@ public class Snake : MonoBehaviour
         int[] tris = new int[2 * 3 * kCircumferenceMax * (m_SplineN + kExtraHeadRows - 1)];
         //Vector2[] uv = new Vector2[2 * (steps + 1)];
 
+        bool isDead = false;
+        Vector3 headPoint = transform.InverseTransformPoint(m_SplinePointsWorld[0]);
         for (int v = 0; v < m_SplineN + kExtraHeadRows; v++)
         {
             // calculate the coordinate system
@@ -108,7 +113,7 @@ public class Snake : MonoBehaviour
             Vector3 spinePoint;
             if (v - kExtraHeadRows <= 0)
             {
-                spinePoint = transform.InverseTransformPoint(m_SplinePointsWorld[0]);
+                spinePoint = headPoint;
             } else if (v - kExtraHeadRows < m_SplineN - 1)
             {
                 spinePoint = transform.InverseTransformPoint(Vector3.Lerp(m_SplinePointsWorld[v - kExtraHeadRows + 1], m_SplinePointsWorld[v - kExtraHeadRows], headSpacing / kSpacing));
@@ -117,10 +122,26 @@ public class Snake : MonoBehaviour
                 spinePoint = transform.InverseTransformPoint(m_SplinePointsWorld[v - kExtraHeadRows]);
             }
 
+            // check for self-collision
+
             // shape the tail
             float tailPortion = Mathf.Max(.1f / m_SnakeLength, 0.25f);
             float tailFactor = Mathf.Clamp01((1.0f - v * kSpacing / m_SnakeLength) / tailPortion);
             float radius = m_SnakeRadius * Mathf.Sin(0.5f * Mathf.PI * tailFactor);
+
+            if ((v - kExtraHeadRows) * kSpacing > 2 * m_SnakeRadius * transform.localScale.x && v < m_SplineN + kExtraHeadRows - 3)
+            {
+                float collisionFactor = Vector3.Distance(headPoint, spinePoint) / (m_SnakeRadius + radius);
+                if (collisionFactor < .8f)
+                {
+                    isDead = true;
+                } else if (collisionFactor < 1.0f)
+                {
+                    bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
+                    float nudgeAmount = (turnLeft ? 1.0f : -1.0f) * 0.1f * m_RotationSpeed * Time.deltaTime;
+                    transform.rotation = Quaternion.AngleAxis(nudgeAmount, transform.forward) * transform.rotation;
+                }
+            }
 
             // shape the head
             if (v < kExtraHeadRows)
@@ -152,6 +173,11 @@ public class Snake : MonoBehaviour
                 }
             }
         }
+        if (isDead)
+        {
+            m_Material.SetColor("_Color", Color.red);
+            m_Speed = 0.0f;
+        }
 
         m_MeshFilter.mesh.Clear();
         m_MeshFilter.mesh.vertices = vertices;
@@ -163,7 +189,6 @@ public class Snake : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<Fruit>() != null)
         {
-            Debug.Log($"This fruit was eaten! {collision.gameObject.name}");
             Destroy(collision.gameObject);
 
             m_SnakeLengthMax += 0.1f;
