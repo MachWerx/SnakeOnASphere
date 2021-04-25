@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private World m_World;
     [SerializeField] private Snake m_Snake;
     [SerializeField] private Fruit m_FruitPrefab;
     [SerializeField] private Transform m_FruitsBasket;
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     {
         m_WorldRadius = 0.5f;
 
-        m_FruitN = 100;
+        m_FruitN = 10;
         m_Fruits = new Fruit[m_FruitN];
 
         for (int i = 0; i < m_FruitN; i++)
@@ -33,6 +34,9 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (m_FruitsBasket.childCount == 0)
+        {
+            m_World.Explode();
+        }
     }
 }
