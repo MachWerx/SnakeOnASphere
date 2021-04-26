@@ -36,8 +36,8 @@ public class Snake : MonoBehaviour
     private int m_Score;
     private const int kFruitScoreIncrement = 50;
     private float m_BonusScoreOverage;
-    private const float kBonusScoreSpeed = 50.0f;
-    private const float kSpeedFactorIncreasePerBonusSecond = 0.5f;
+    private const float kBonusScoreSpeed = 100.0f;
+    private const float kSpeedFactorIncreasePerBonusSecond = 0.1f;
     private const float kSpeedFactorIncreasePerFruit = .01f;
     private const float kFruitLengthIncrement = 0.02f;
 
@@ -199,7 +199,7 @@ public class Snake : MonoBehaviour
                 float tailFactor = Mathf.Clamp01((1.0f - v * kSpacing / m_SnakeLength) / tailPortion);
                 float radius = m_SnakeRadius * Mathf.Sin(0.5f * Mathf.PI * tailFactor);
 
-                if ((v - kExtraHeadRows) * kSpacing > 2 * m_SnakeRadius * transform.localScale.x && v < m_SplineN + kExtraHeadRows - 3)
+                if ((v - kExtraHeadRows) * kSpacing > 4.0f * m_SnakeRadius * transform.localScale.x && v < m_SplineN + kExtraHeadRows - 3)
                 {
                     float collisionFactor = Vector3.Distance(headPoint, spinePoint) / (m_SnakeRadius + radius);
                     // check for self-collision
