@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PostProcessVolume m_PostProcessVolume;
     [SerializeField] private TMPro.TextMeshPro m_Score;
 
+    [SerializeField] private AudioSource m_GameStart;
+    [SerializeField] private AudioSource m_NextLevelSound;
+
     private float m_WorldRadius = 0.5f;
     private int m_FruitN;
     private Fruit[] m_Fruits;
@@ -90,6 +93,8 @@ public class GameManager : MonoBehaviour
                 m_LevelIndicatorsTransform.gameObject.SetActive(true);
                 Cursor.visible = false;
                 Cursor.lockState = CursorLockMode.Locked;
+
+                m_GameStart.Play();
             }
         }
         
@@ -102,7 +107,7 @@ public class GameManager : MonoBehaviour
                 m_World = m_WorldNext;
                 m_World.BurstColor();
                 SpawnNextWorld();
-
+                m_NextLevelSound.Play();
                 Destroy(m_LevelIndicators[m_CurrentLevel - 1]);
             }
 

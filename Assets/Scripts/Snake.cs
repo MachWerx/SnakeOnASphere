@@ -2,6 +2,10 @@
 
 public class Snake : MonoBehaviour
 {
+    [SerializeField] private AudioSource m_AppleChomp;
+    [SerializeField] private AudioSource m_DeathSound;
+
+
     public float distanceFromCenter { private get; set; }
 
 
@@ -192,6 +196,7 @@ public class Snake : MonoBehaviour
                     {
                         m_Mode = Mode.Dying;
                         m_DeathFactor = 1.0f;
+                        m_DeathSound.Play();
                     } else if (collisionFactor < 1.0f)
                     {
                         bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
@@ -277,6 +282,7 @@ public class Snake : MonoBehaviour
             score += kFruitScoreIncrement;
             m_SnakeLengthMax += kFruitLengthIncrement;
             m_SpeedFactor += kSpeedFactorIncreasePerFruit;
+            m_AppleChomp.Play();
         }
     }
 
