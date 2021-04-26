@@ -14,8 +14,8 @@ public class CameraFollow : MonoBehaviour
         m_DistanceFromCenter = 1.5f;
     }
 
-    // Update is called once per frame
-    void Update()
+    // Late update is called once per frame after Update is called for everything else
+    private void LateUpdate()
     {
         transform.position = m_Snake.position.normalized * m_DistanceFromCenter;
         transform.rotation = Quaternion.LookRotation(m_Snake.forward, m_Snake.up);
