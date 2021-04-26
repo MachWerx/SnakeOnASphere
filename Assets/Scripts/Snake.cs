@@ -79,9 +79,6 @@ public class Snake : MonoBehaviour
         if (m_FirstInit)
         {
             m_SplinePointsWorld = new Vector3[kSplineMax];
-            m_SplineN = 2;
-            m_SplinePointsWorld[0] = transform.position;
-            m_SplinePointsWorld[1] = transform.position;
 
             m_MeshFilter = gameObject.GetComponent<MeshFilter>();
             m_Material = gameObject.GetComponent<MeshRenderer>().material;
@@ -91,6 +88,10 @@ public class Snake : MonoBehaviour
 
             m_FirstInit = false;
         }
+
+        m_SplineN = 2;
+        m_SplinePointsWorld[0] = transform.position;
+        m_SplinePointsWorld[1] = transform.position;
 
         m_Mode = Mode.Menu;
         distanceFromCenter = .5f;
