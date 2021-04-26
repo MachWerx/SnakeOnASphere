@@ -205,9 +205,9 @@ public class Snake : MonoBehaviour
                     // check for self-collision
                     if (collisionFactor < .8f && m_Mode == Mode.Alive)
                     {
-                        //m_Mode = Mode.Dying;
-                        //m_DeathFactor = 1.0f;
-                        //m_DeathSound.Play();
+                        m_Mode = Mode.Dying;
+                        m_DeathFactor = 1.0f;
+                        m_DeathSound.Play();
                     } else if (collisionFactor < 1.0f)
                     {
                         bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
