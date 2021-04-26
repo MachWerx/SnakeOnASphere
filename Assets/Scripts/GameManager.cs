@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
 
     private void AddFruits()
     {
-        m_FruitN = 1;
+        m_FruitN = 10;
         m_Fruits = new Fruit[m_FruitN];
 
         for (int i = 0; i < m_FruitN; i++)

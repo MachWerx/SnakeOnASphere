@@ -7,6 +7,7 @@ public class Snake : MonoBehaviour
 
     private float m_Speed;
     private float m_RotationSpeed;
+    private float m_SpeedFactor;
     private float m_SnakeLength;
     private float m_SnakeLengthMax;
     private float m_SnakeRadius;
@@ -31,6 +32,9 @@ public class Snake : MonoBehaviour
     private const int kFruitScoreIncrement = 50;
     private float m_BonusScoreOverage;
     private const float kBonusScoreSpeed = 50.0f;
+    private const float kSpeedFactorIncreasePerBonusSecond = 1.0f;
+    private const float kSpeedFactorIncreasePerFruit = .01f;
+    private const float kFruitLengthIncrement = 0.02f;
 
     private int score
     {
@@ -77,9 +81,7 @@ public class Snake : MonoBehaviour
         distanceFromCenter = .5f;
         m_Speed = 0.2f;
         m_RotationSpeed = 180;
-        float speedFactor = 2.0f;
-        m_Speed *= speedFactor;
-        m_RotationSpeed *= speedFactor;
+        m_SpeedFactor = 1.0f;
         m_SnakeLength = m_SnakeLengthMax = 0.2f;
         m_SnakeRadius = 0.5f;
         m_Material.color = m_InitialColor;
@@ -97,11 +99,11 @@ public class Snake : MonoBehaviour
             // turn the snake
             if (Input.GetKey(KeyCode.LeftArrow))
             {
-                transform.rotation = Quaternion.AngleAxis(m_RotationSpeed * Time.deltaTime, transform.forward) * transform.rotation;
+                transform.rotation = Quaternion.AngleAxis(m_SpeedFactor * m_RotationSpeed * Time.deltaTime, transform.forward) * transform.rotation;
             }
             if (Input.GetKey(KeyCode.RightArrow))
             {
-                transform.rotation = Quaternion.AngleAxis(-m_RotationSpeed * Time.deltaTime, transform.forward) * transform.rotation;
+                transform.rotation = Quaternion.AngleAxis(-m_SpeedFactor * m_RotationSpeed * Time.deltaTime, transform.forward) * transform.rotation;
             }
             float axisDelta = Input.GetAxis("Mouse X") / Camera.main.pixelWidth;
             if (Mathf.Abs(axisDelta) > 0.01f) axisDelta = 0.0f;
@@ -111,7 +113,7 @@ public class Snake : MonoBehaviour
             //if (Input.GetKey(KeyCode.UpArrow))
             {
                 Vector3 pos = transform.position;
-                pos += m_Speed * transform.up * Time.deltaTime;
+                pos += m_SpeedFactor * m_Speed * transform.up * Time.deltaTime;
                 pos = distanceFromCenter * pos.normalized;
                 float distanceTraveled = Vector3.Distance(transform.position, pos);
                 transform.position = pos;
@@ -193,7 +195,7 @@ public class Snake : MonoBehaviour
                     } else if (collisionFactor < 1.0f)
                     {
                         bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
-                        float nudgeAmount = (turnLeft ? 1.0f : -1.0f) * 0.1f * m_RotationSpeed * Time.deltaTime;
+                        float nudgeAmount = (turnLeft ? 1.0f : -1.0f) * 0.1f * m_SpeedFactor * m_RotationSpeed * Time.deltaTime;
                         transform.rotation = Quaternion.AngleAxis(nudgeAmount, transform.forward) * transform.rotation;
                     }
                 }
@@ -249,8 +251,10 @@ public class Snake : MonoBehaviour
             m_BonusScoreOverage += kBonusScoreSpeed * Time.deltaTime;
             if (m_BonusScoreOverage > 1.0f)
             {
-                m_BonusScoreOverage -= 1.0f;
-                score++;
+                int overageDelta = (int)m_BonusScoreOverage;
+                m_BonusScoreOverage -= overageDelta;
+                score += overageDelta;
+                m_SpeedFactor += kSpeedFactorIncreasePerBonusSecond * Time.deltaTime;
             }
         }
     }
@@ -271,7 +275,8 @@ public class Snake : MonoBehaviour
         {
             Destroy(collision.gameObject);
             score += kFruitScoreIncrement;
-            m_SnakeLengthMax += 0.1f;
+            m_SnakeLengthMax += kFruitLengthIncrement;
+            m_SpeedFactor += kSpeedFactorIncreasePerFruit;
         }
     }
 
