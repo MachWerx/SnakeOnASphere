@@ -1367,6 +1367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AppleChomp: {fileID: 665143117}
   m_DeathSound: {fileID: 1970034730}
+  m_BonusModeSound: {fileID: 1698268863}
 --- !u!135 &1219128949
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1987,7 +1988,7 @@ GameObject:
   - component: {fileID: 1698268862}
   - component: {fileID: 1698268863}
   m_Layer: 0
-  m_Name: Audio Source
+  m_Name: BonusMode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2017,7 +2018,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 441e81aaa097d7b46928e1f82e1053d6, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 387417446b5c42e4dbc498b991e83fe3, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

@@ -4,6 +4,7 @@ public class Snake : MonoBehaviour
 {
     [SerializeField] private AudioSource m_AppleChomp;
     [SerializeField] private AudioSource m_DeathSound;
+    [SerializeField] private AudioSource m_BonusModeSound;
 
 
     public float distanceFromCenter { private get; set; }
@@ -36,7 +37,7 @@ public class Snake : MonoBehaviour
     private const int kFruitScoreIncrement = 50;
     private float m_BonusScoreOverage;
     private const float kBonusScoreSpeed = 50.0f;
-    private const float kSpeedFactorIncreasePerBonusSecond = 1.0f;
+    private const float kSpeedFactorIncreasePerBonusSecond = 0.5f;
     private const float kSpeedFactorIncreasePerFruit = .01f;
     private const float kFruitLengthIncrement = 0.02f;
 
@@ -52,10 +53,20 @@ public class Snake : MonoBehaviour
 
     private bool m_FirstInit = true;
     enum Mode { Menu, Alive, Dying, Dead }
+
+    private bool m_BonusMode;
     public bool bonusMode
     {
-        private get;
-        set;
+        private get { return m_BonusMode; }
+        set
+        {
+            if (!m_BonusMode && value)
+            {
+                m_SpeedFactor = 1.0f;
+                m_BonusModeSound.Play();
+            }
+            m_BonusMode = value;
+        }
     }
 
     // Start is called before the first frame update
@@ -194,9 +205,9 @@ public class Snake : MonoBehaviour
                     // check for self-collision
                     if (collisionFactor < .8f && m_Mode == Mode.Alive)
                     {
-                        m_Mode = Mode.Dying;
-                        m_DeathFactor = 1.0f;
-                        m_DeathSound.Play();
+                        //m_Mode = Mode.Dying;
+                        //m_DeathFactor = 1.0f;
+                        //m_DeathSound.Play();
                     } else if (collisionFactor < 1.0f)
                     {
                         bool turnLeft = Vector3.Dot(headPoint - spinePoint, Vector3.right) < 0;
